@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
     // Определяем страну по системным заголовкам хостинга (Vercel / Cloudflare) или геолокации Edge
     const countryHeader = 
       request.headers.get('x-vercel-ip-country') || 
-      request.geo?.country || 
+      (request as any).geo?.country || 
       'RU';
 
     const upperCountry = countryHeader.toUpperCase();

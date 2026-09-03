@@ -3,9 +3,15 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { PRODUCTS, Product } from '@/data/products';
+import { PRODUCTS, Product, tText, tList } from '@/data/products';
+import { Language } from '@/data/translations';
 
-export default function ProductGrid({ currency = 'RUB' }: { currency: keyof Product['price'] }) {
+interface ProductGridProps {
+  currency?: keyof Product['price'];
+  lang?: Language;
+}
+
+export default function ProductGrid({ currency = 'RUB', lang = 'ru' }: ProductGridProps) {
   const [purchaseType, setPurchaseType] = useState<Record<string, 'once' | 'subscribe'>>({
     'beauty-complex': 'subscribe',
     'pure-collagen': 'once'
@@ -37,6 +43,12 @@ export default function ProductGrid({ currency = 'RUB' }: { currency: keyof Prod
               ? Math.round(basePrice * (1 - product.subscriptionDiscount / 100))
               : basePrice;
 
+            // Получаем локализованные тексты и списки через вспомогательные функции
+            const title = tText(product.title, lang);
+            const subtitle = tText(product.subtitle, lang);
+            const badges = tList(product.badges, lang);
+            const composition = tList(product.composition, lang);
+
             return (
               <div 
                 key={product.id}
@@ -46,7 +58,7 @@ export default function ProductGrid({ currency = 'RUB' }: { currency: keyof Prod
                 <div className="relative w-full h-80 bg-[#EEF4F0] p-6 flex items-center justify-center overflow-hidden">
                   <Image
                     src={product.image}
-                    alt={product.title}
+                    alt={title}
                     fill
                     unoptimized
                     className="object-contain object-center group-hover:scale-105 transition-transform duration-500"
@@ -61,15 +73,15 @@ export default function ProductGrid({ currency = 'RUB' }: { currency: keyof Prod
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="text-xl font-bold text-[#2A4736] mb-1 font-montserrat">
-                      {product.title}
+                      {title}
                     </h3>
                     <p className="text-xs text-[#376C4A] font-medium mb-4">
-                      {product.subtitle}
+                      {subtitle}
                     </p>
 
                     {/* Бейджи преимуществ */}
                     <div className="flex flex-wrap gap-1.5 mb-5">
-                      {product.badges.map((badge, idx) => (
+                      {badges.map((badge, idx) => (
                         <span 
                           key={idx}
                           className="bg-[#EEF4F0] text-[#2A4736] text-[11px] font-semibold px-2.5 py-1 rounded-md border border-[#CBE0D4]"
@@ -81,7 +93,7 @@ export default function ProductGrid({ currency = 'RUB' }: { currency: keyof Prod
 
                     {/* Краткий состав */}
                     <ul className="space-y-1.5 mb-6 text-xs text-gray-600 border-t border-[#EEF4F0] pt-4">
-                      {product.composition.map((item, idx) => (
+                      {composition.map((item, idx) => (
                         <li key={idx} className="flex items-center gap-2">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
                           <span>{item}</span>
