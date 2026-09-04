@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { PRODUCTS, tText, tList } from '@/data/products';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface HeroProductSliderProps {
   lang?: Language | string;
@@ -12,23 +13,16 @@ interface HeroProductSliderProps {
 }
 
 export default function HeroProductSlider({
-  lang = 'ru',
-  currency = 'RUB'
+  lang = 'ru'
 }: HeroProductSliderProps) {
+  const { formatPrice } = useCurrency();
+
   // Приводим код языка к поддерживаемому диапазону (по умолчанию 'ru')
   const activeLang: Language = (['ru', 'en', 'tr', 'uz', 'de'].includes(lang) ? lang : 'ru') as Language;
   const tUI = UI_TRANSLATIONS[activeLang] || UI_TRANSLATIONS.ru;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-
-  const currencySymbols: Record<string, string> = {
-    RUB: '₽',
-    UZS: 'сум',
-    TRY: '₺',
-    EUR: '€',
-    PLN: 'zł'
-  };
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % PRODUCTS.length);
@@ -73,6 +67,7 @@ export default function HeroProductSlider({
         >
           {/* СТРЕЛКА ВЛЕВО (По левому краю) */}
           <button
+            type="button"
             onClick={prevSlide}
             className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 backdrop-blur-md border border-[#CBE0D4] text-[#2A4736] hover:bg-[#376C4A] hover:text-white transition-all duration-200 flex items-center justify-center shadow-md active:scale-95"
             aria-label={tUI.prevSlide}
@@ -84,6 +79,7 @@ export default function HeroProductSlider({
 
           {/* СТРЕЛКА ВПРАВО (По правому краю) */}
           <button
+            type="button"
             onClick={nextSlide}
             className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 backdrop-blur-md border border-[#CBE0D4] text-[#2A4736] hover:bg-[#376C4A] hover:text-white transition-all duration-200 flex items-center justify-center shadow-md active:scale-95"
             aria-label={tUI.nextSlide}
@@ -99,8 +95,7 @@ export default function HeroProductSlider({
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
             {PRODUCTS.map((product) => {
-              const price = product.price[currency as keyof typeof product.price] || product.price.RUB;
-              const symbol = currencySymbols[currency] || '₽';
+              const formattedPrice = formatPrice(product.basePriceUZS || 0);
               const title = tText(product.title, activeLang);
               const subtitle = tText(product.subtitle, activeLang);
               const compositionList = tList(product.composition, activeLang);
@@ -168,7 +163,7 @@ export default function HeroProductSlider({
                       <div>
                         <span className="text-[10px] text-gray-400 block font-medium">{tUI.price}</span>
                         <span className="text-xl sm:text-2xl font-black text-[#2A4736]">
-                          {price.toLocaleString()} {symbol}
+                          {formattedPrice}
                         </span>
                       </div>
 
@@ -193,6 +188,7 @@ export default function HeroProductSlider({
             {PRODUCTS.map((_, idx) => (
               <button
                 key={idx}
+                type="button"
                 onClick={() => setCurrentIndex(idx)}
                 className={`h-2 transition-all duration-300 rounded-full ${
                   currentIndex === idx ? 'w-7 bg-[#376C4A]' : 'w-2 bg-[#CBE0D4] hover:bg-[#376C4A]/50'

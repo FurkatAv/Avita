@@ -1,6 +1,7 @@
 {
   "name": "avita",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +10,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@payloadcms/db-postgres": "^3.88.0",
+    "@payloadcms/richtext-lexical": "^3.88.0",
     "next": "16.3.4",
+    "payload": "^3.88.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },

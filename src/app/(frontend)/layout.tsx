@@ -1,5 +1,5 @@
 import './globals.css';
-import { CurrencyProvider } from '../context/CurrencyContext';
+import { CurrencyProvider } from '@/context/CurrencyContext'; // Алиас @ указывает на папку src
 
 export default function RootLayout({
   children,

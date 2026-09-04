@@ -16,13 +16,7 @@ export interface Product {
   stickWeight: string;
   badges: LocalizedList;
   composition: LocalizedList;
-  price: {
-    RUB: number;
-    UZS: number;
-    TRY: number;
-    EUR: number;
-    PLN: number;
-  };
+  basePriceUZS: number; // Единая базовая цена в сумах
   subscriptionDiscount: number;
 }
 
@@ -109,7 +103,7 @@ export const PRODUCTS: Product[] = [
         "30 Einzelportione-Sachets à 11,2 g"
       ]
     },
-    price: { RUB: 2890, UZS: 435000, TRY: 440, EUR: 34, PLN: 145 },
+    basePriceUZS: 435000,
     subscriptionDiscount: 10
   },
 
@@ -169,7 +163,7 @@ export const PRODUCTS: Product[] = [
         "100% gidrolizlangan qoramol kollagen peptidlari (I va III tur)",
         "Bitta stikda 9.2 g oqsil va atigi 36 kkal (10 g)",
         "Boy aminokislotalar profili: Glitsin, Prolin, Alanin",
-        "Shakarsiz, GMOsiz va sun'iy xushbo'ylagichlarsiz",
+        "Shakarsiz, GMOsiz va xushbo'ylagichlarsiz",
         "30 dona 10 g stiklar"
       ],
       de: [
@@ -180,7 +174,7 @@ export const PRODUCTS: Product[] = [
         "30 Portionssticks à 10 g"
       ]
     },
-    price: { RUB: 2590, UZS: 390000, TRY: 390, EUR: 30, PLN: 130 },
+    basePriceUZS: 390000,
     subscriptionDiscount: 10
   },
 
@@ -246,7 +240,7 @@ export const PRODUCTS: Product[] = [
         "Zink, Selen, Vitamin E"
       ]
     },
-    price: { RUB: 2790, UZS: 420000, TRY: 420, EUR: 32, PLN: 140 },
+    basePriceUZS: 420000,
     subscriptionDiscount: 10
   },
 
@@ -307,7 +301,7 @@ export const PRODUCTS: Product[] = [
         "Vollständiges Aminosäurenprofil für Gelenke und Muskeln"
       ]
     },
-    price: { RUB: 2490, UZS: 370000, TRY: 370, EUR: 28, PLN: 125 },
+    basePriceUZS: 370000,
     subscriptionDiscount: 10
   }
 ];

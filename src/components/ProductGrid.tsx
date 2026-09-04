@@ -5,25 +5,21 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { PRODUCTS, Product, tText, tList } from '@/data/products';
 import { Language } from '@/data/translations';
+import { useCurrency } from '@/context/CurrencyContext'; // Подключаем контекст валют
 
 interface ProductGridProps {
-  currency?: keyof Product['price'];
+  currency?: string;
   lang?: Language;
 }
 
-export default function ProductGrid({ currency = 'RUB', lang = 'ru' }: ProductGridProps) {
+export default function ProductGrid({ lang = 'ru' }: ProductGridProps) {
+  // Получаем текущую валюту и функцию форматирования из контекста
+  const { formatPrice } = useCurrency();
+
   const [purchaseType, setPurchaseType] = useState<Record<string, 'once' | 'subscribe'>>({
     'beauty-complex': 'subscribe',
     'pure-collagen': 'once'
   });
-
-  const currencySymbols: Record<string, string> = {
-    RUB: '₽',
-    UZS: 'сум',
-    TRY: '₺',
-    EUR: '€',
-    PLN: 'zł'
-  };
 
   return (
     <section className="py-12 bg-[#FAF9F6]">
@@ -38,19 +34,27 @@ export default function ProductGrid({ currency = 'RUB', lang = 'ru' }: ProductGr
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {PRODUCTS.map((product) => {
             const isSub = purchaseType[product.id] === 'subscribe';
-            const basePrice = product.price[currency] || product.price.RUB;
-            const finalPrice = isSub 
-              ? Math.round(basePrice * (1 - product.subscriptionDiscount / 100))
-              : basePrice;
 
-            // Получаем локализованные тексты и списки через вспомогательные функции
+            // Расчет стоимости в UZS
+            const basePriceUZS = product.basePriceUZS;
+            const discountPercent = product.subscriptionDiscount || 0;
+            
+            // Финальная цена в UZS с учетом типа покупки
+            const currentPriceUZS = isSub
+              ? Math.round(basePriceUZS * (1 - discountPercent / 100))
+              : basePriceUZS;
+
+            // Сумма экономии в UZS
+            const savingsUZS = Math.round(basePriceUZS * (discountPercent / 100));
+
+            // Получаем локализованные тексты и списки
             const title = tText(product.title, lang);
             const subtitle = tText(product.subtitle, lang);
             const badges = tList(product.badges, lang);
             const composition = tList(product.composition, lang);
 
             return (
-              <div 
+              <div
                 key={product.id}
                 className="bg-white rounded-2xl border border-[#CBE0D4] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group"
               >
@@ -82,7 +86,7 @@ export default function ProductGrid({ currency = 'RUB', lang = 'ru' }: ProductGr
                     {/* Бейджи преимуществ */}
                     <div className="flex flex-wrap gap-1.5 mb-5">
                       {badges.map((badge, idx) => (
-                        <span 
+                        <span
                           key={idx}
                           className="bg-[#EEF4F0] text-[#2A4736] text-[11px] font-semibold px-2.5 py-1 rounded-md border border-[#CBE0D4]"
                         >
@@ -109,8 +113,8 @@ export default function ProductGrid({ currency = 'RUB', lang = 'ru' }: ProductGr
                         type="button"
                         onClick={() => setPurchaseType(p => ({ ...p, [product.id]: 'once' }))}
                         className={`py-2 text-xs font-bold rounded-lg transition-all ${
-                          !isSub 
-                            ? 'bg-white text-[#2A4736] shadow-sm' 
+                          !isSub
+                            ? 'bg-white text-[#2A4736] shadow-sm'
                             : 'text-gray-500 hover:text-[#2A4736]'
                         }`}
                       >
@@ -120,24 +124,27 @@ export default function ProductGrid({ currency = 'RUB', lang = 'ru' }: ProductGr
                         type="button"
                         onClick={() => setPurchaseType(p => ({ ...p, [product.id]: 'subscribe' }))}
                         className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
-                          isSub 
-                            ? 'bg-[#376C4A] text-white shadow-sm' 
+                          isSub
+                            ? 'bg-[#376C4A] text-white shadow-sm'
                             : 'text-gray-500 hover:text-[#376C4A]'
                         }`}
                       >
-                        Курс <span className="bg-[#D4AF37] text-white text-[10px] px-1.5 py-0.5 rounded">-10%</span>
+                        Курс <span className="bg-[#D4AF37] text-white text-[10px] px-1.5 py-0.5 rounded">-{discountPercent}%</span>
                       </button>
                     </div>
 
                     {/* Цена и кнопка покупки */}
                     <div className="flex items-center justify-between">
                       <div>
+                        {/* Отображение сконвертированной цены */}
                         <span className="text-2xl font-black text-[#2A4736]">
-                          {finalPrice.toLocaleString()} {currencySymbols[currency]}
+                          {formatPrice(currentPriceUZS)}
                         </span>
-                        {isSub && (
+                        
+                        {/* Отображение экономии при подписке */}
+                        {isSub && discountPercent > 0 && (
                           <span className="block text-[11px] text-[#D4AF37] font-bold">
-                            Экономия {Math.round(basePrice * 0.1).toLocaleString()} {currencySymbols[currency]}
+                            Экономия {formatPrice(savingsUZS)}
                           </span>
                         )}
                       </div>

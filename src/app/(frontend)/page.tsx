@@ -1,6 +1,7 @@
 // app/page.tsx
 'use client';
 
+import { useCurrency } from '@/context/CurrencyContext';
 import { useState } from 'react';
 import Image from 'next/image';
 import HeroProductSlider from '@/components/HeroProductSlider';
@@ -8,8 +9,8 @@ import { PRODUCTS, tText, tList } from '@/data/products';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
 
 export default function HomePage() {
+  const { formatPrice, currency, setCurrency } = useCurrency();
   const [currentLanguage, setCurrentLanguage] = useState<Language>('ru');
-  const [currentCurrency, setCurrentCurrency] = useState<string>('RUB');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [cartCount, setCartCount] = useState<number>(0);
@@ -25,14 +26,6 @@ export default function HomePage() {
   ];
 
   const currencies = ['RUB', 'UZS', 'TRY', 'EUR', 'PLN'];
-
-  const currencySymbols: Record<string, string> = {
-    RUB: '₽',
-    UZS: 'сум',
-    TRY: '₺',
-    EUR: '€',
-    PLN: 'zł'
-  };
 
   // Категории для фикс-панели под шапкой
   const categories = [
@@ -63,7 +56,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#FAF9F6]">
       
-      {/* 1. ПОЛНОЦЕННАЯ ZAKREPLENNAYA ШАПКА (STICKY HEADER) */}
+      {/* 1. ПОЛНОЦЕННАЯ ЗАКРЕПЛЕННАЯ ШАПКА (STICKY HEADER) */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm">
         
         {/* Верхняя часть шапки */}
@@ -135,10 +128,10 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Валюта */}
+            {/* Валюта (связана с CurrencyContext) */}
             <select
-              value={currentCurrency}
-              onChange={(e) => setCurrentCurrency(e.target.value)}
+              value={currency}
+              onChange={(e) => setCurrency?.(e.target.value)}
               className="bg-[#FAF9F6] border border-[#CBE0D4] text-[#2A4736] text-xs font-bold rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#376C4A] cursor-pointer"
             >
               {currencies.map((curr) => (
@@ -196,7 +189,7 @@ export default function HomePage() {
       {/* 3. ГЛАВНЫЙ СЛАЙДЕР ТОВАРОВ */}
       <HeroProductSlider 
         lang={currentLanguage} 
-        currency={currentCurrency} 
+        currency={currency} 
       />
 
       {/* 4. КАТАЛОГ ТОВАРОВ С КНОПКАМИ "КУПИТЬ" И "В КОРЗИНУ" */}
@@ -217,8 +210,7 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => {
-              const price = product.price[currentCurrency as keyof typeof product.price] || product.price.RUB;
-              const symbol = currencySymbols[currentCurrency] || '₽';
+              const formattedPrice = formatPrice(product.basePriceUZS || 0);
               const title = tText(product.title, currentLanguage);
               const subtitle = tText(product.subtitle, currentLanguage);
               const badgesList = tList(product.badges, currentLanguage);
@@ -226,21 +218,18 @@ export default function HomePage() {
               return (
                 <div
                   key={product.id}
-                  className="bg-white rounded-2xl border border-[#CBE0D4] p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
+                  className="bg-white rounded-2xl border border-[#CBE0D4] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group"
                 >
                   <div>
-                    {/* Изображение */}
-                    <div className="relative w-full h-48 bg-[#EEF4F0] rounded-xl mb-4 p-2 flex items-center justify-center overflow-hidden">
+                    {/* Картинка */}
+                    <div className="relative w-full h-48 bg-[#EEF4F0] rounded-xl mb-4 p-4 flex items-center justify-center overflow-hidden">
                       <Image
                         src={product.image}
                         alt={title}
                         fill
                         unoptimized
-                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                        className="object-contain group-hover:scale-105 transition-transform duration-300"
                       />
-                      <span className="absolute top-2 left-2 bg-[#D4AF37] text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                        {product.weight}
-                      </span>
                     </div>
 
                     {/* Название и описание */}
@@ -269,7 +258,7 @@ export default function HomePage() {
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-gray-400 block">{tUI.price}</span>
                       <span className="text-lg font-black text-[#2A4736]">
-                        {price.toLocaleString()} {symbol}
+                        {formattedPrice}
                       </span>
                     </div>
 
