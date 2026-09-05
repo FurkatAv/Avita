@@ -246,6 +246,14 @@ export interface Slider {
   title: string;
   image: number | Media;
   link?: string | null;
+  /**
+   * Автоматически станет первым в карусели
+   */
+  isFeatured?: boolean | null;
+  /**
+   * Меньше число — раньше в списке (для остальных)
+   */
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -435,6 +443,8 @@ export interface SlidersSelect<T extends boolean = true> {
   title?: T;
   image?: T;
   link?: T;
+  isFeatured?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }
