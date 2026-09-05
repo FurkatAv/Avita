@@ -18,7 +18,6 @@ export default function HeroProductSlider({
   const activeLang: Language = (['ru', 'en', 'tr', 'uz', 'de'].includes(lang) ? lang : 'ru') as Language;
   const tUI = UI_TRANSLATIONS[activeLang] || UI_TRANSLATIONS.ru;
 
-  // Используем слайды из базы данных Payload CMS
   const items = sliders && sliders.length > 0 ? sliders : [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,7 +31,6 @@ export default function HeroProductSlider({
     setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
   }, [items.length]);
 
-  // Автопрокрутка
   useEffect(() => {
     if (isPaused || items.length <= 1) return;
 
@@ -46,7 +44,6 @@ export default function HeroProductSlider({
 
   if (!items || items.length === 0) return null;
 
-  // Хелпер для безопасного получения URL изображения из Payload Media
   const resolveImage = (imageField: any): string => {
     if (!imageField) return '/placeholder.png';
     if (typeof imageField === 'string') return imageField;
@@ -61,7 +58,6 @@ export default function HeroProductSlider({
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Кнопка «Назад» */}
           {items.length > 1 && (
             <button
               type="button"
@@ -75,7 +71,6 @@ export default function HeroProductSlider({
             </button>
           )}
 
-          {/* Кнопка «Вперед» */}
           {items.length > 1 && (
             <button
               type="button"
@@ -89,7 +84,6 @@ export default function HeroProductSlider({
             </button>
           )}
 
-          {/* Трек слайдера */}
           <div
             className="w-full flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -103,9 +97,8 @@ export default function HeroProductSlider({
               return (
                 <div
                   key={item.id || index}
-                  className="w-full shrink-0 flex flex-col md:flex-row items-center justify-between gap-8 p-6 sm:p-12 min-h-[380px] bg-gradient-to-r from-[#FAF9F6] to-[#EEF4F0]"
+                  className="w-full shrink-0 flex flex-col md:flex-row items-center justify-between gap-8 p-6 sm:p-12 min-h-[420px] bg-gradient-to-r from-[#FAF9F6] to-[#EEF4F0]"
                 >
-                  {/* Текстовая часть */}
                   <div className="w-full md:w-1/2 flex flex-col items-start justify-center text-left space-y-4">
                     {isFeatured && (
                       <span className="bg-[#D4AF37] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
@@ -132,15 +125,14 @@ export default function HeroProductSlider({
                     )}
                   </div>
 
-                  {/* Картинка */}
-                  <div className="relative w-full md:w-1/2 h-64 sm:h-80 rounded-2xl overflow-hidden shadow-inner bg-white/50 border border-[#CBE0D4]/60 flex items-center justify-center">
+                  <div className="relative w-full md:w-1/2 h-72 sm:h-96 rounded-2xl overflow-hidden bg-white/60 border border-[#CBE0D4]/60 flex items-center justify-center p-4 shadow-inner">
                     <Image
                       src={imageUrl}
                       alt={title || 'Slide image'}
                       priority={index === 0}
                       fill
                       unoptimized
-                      className="object-cover hover:scale-105 transition-transform duration-700"
+                      className="object-contain p-3 hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                 </div>
@@ -148,7 +140,6 @@ export default function HeroProductSlider({
             })}
           </div>
 
-          {/* Индикаторы (точки) */}
           {items.length > 1 && (
             <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 z-20">
               {items.map((_, idx) => (
