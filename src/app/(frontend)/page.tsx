@@ -9,7 +9,7 @@ import { PRODUCTS, tText, tList } from '@/data/products';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
 
 export default function HomePage() {
-  const { formatPrice, currency, setCurrency } = useCurrency();
+  const { currency, setCurrency, formatPrice } = useCurrency() as any;
   const [currentLanguage, setCurrentLanguage] = useState<Language>('ru');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -131,7 +131,7 @@ export default function HomePage() {
             {/* Валюта (связана с CurrencyContext) */}
             <select
               value={currency}
-              onChange={(e) => setCurrency?.(e.target.value)}
+              onChange={(e) => setCurrency(e.target.value as any)}
               className="bg-[#FAF9F6] border border-[#CBE0D4] text-[#2A4736] text-xs font-bold rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#376C4A] cursor-pointer"
             >
               {currencies.map((curr) => (
