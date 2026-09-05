@@ -97,9 +97,10 @@ export default function HeroProductSlider({
               return (
                 <div
                   key={item.id || index}
-                  className="w-full shrink-0 flex flex-col md:flex-row items-center justify-between gap-8 p-6 sm:p-12 min-h-[420px] bg-gradient-to-r from-[#FAF9F6] to-[#EEF4F0]"
+                  className="w-full shrink-0 flex flex-col md:flex-row items-stretch justify-between bg-gradient-to-r from-[#FAF9F6] to-[#EEF4F0]"
                 >
-                  <div className="w-full md:w-1/2 flex flex-col items-start justify-center text-left space-y-4">
+                  {/* Текстовая часть */}
+                  <div className="w-full md:w-1/2 flex flex-col items-start justify-center text-left p-6 sm:p-12 space-y-4">
                     {isFeatured && (
                       <span className="bg-[#D4AF37] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
                         Главная витрина
@@ -125,14 +126,15 @@ export default function HeroProductSlider({
                     )}
                   </div>
 
-                  <div className="relative w-full md:w-1/2 h-72 sm:h-96 rounded-2xl overflow-hidden bg-white/60 border border-[#CBE0D4]/60 flex items-center justify-center p-4 shadow-inner">
+                  {/* Картинка на весь край */}
+                  <div className="relative w-full md:w-1/2 min-h-[300px] md:min-h-[420px] overflow-hidden">
                     <Image
                       src={imageUrl}
                       alt={title || 'Slide image'}
                       priority={index === 0}
                       fill
                       unoptimized
-                      className="object-contain p-3 hover:scale-105 transition-transform duration-700"
+                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                 </div>
