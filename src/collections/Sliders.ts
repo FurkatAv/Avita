@@ -4,18 +4,19 @@ export const Sliders: CollectionConfig = {
   slug: 'sliders',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'isFeatured', 'order', 'updatedAt'],
+    defaultColumns: ['image', 'title', 'isFeatured', 'order', 'updatedAt'],
   },
   hooks: {
     beforeChange: [
-      async ({ data, req }) => {
-        // Если текущий слайд сохраняется как главный (Витрина)
-        if (data.isFeatured) {
-          // Сбрасываем флаг isFeatured у всех остальных слайдов
+      async ({ data, req, originalDoc }) => {
+        if (data?.isFeatured) {
           await req.payload.update({
             collection: 'sliders',
             where: {
-              isFeatured: { equals: true },
+              and: [
+                { isFeatured: { equals: true } },
+                ...(originalDoc?.id ? [{ id: { not_equals: originalDoc.id } }] : []),
+              ],
             },
             data: {
               isFeatured: false,
