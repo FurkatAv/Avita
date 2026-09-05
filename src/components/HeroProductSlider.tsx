@@ -31,13 +31,13 @@ export default function HeroProductSlider({
     setCurrentIndex((prevIndex) => (prevIndex - 1 + PRODUCTS.length) % PRODUCTS.length);
   }, []);
 
-  // Автоматическое листание каждые 5 секунд (5000 мс)
+  // Автоматическое листание каждые 3 секунды (3000 мс)
   useEffect(() => {
     if (isPaused) return;
 
     const timer = setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(timer);
   }, [isPaused, nextSlide]);
