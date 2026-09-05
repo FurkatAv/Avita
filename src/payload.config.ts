@@ -1,3 +1,4 @@
+import { Sliders } from './collections/Sliders';
 import { buildConfig } from 'payload';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
@@ -25,7 +26,7 @@ export default buildConfig({
     },
   }),
   editor: lexicalEditor({}),
-  collections: [Products, Categories, Media, Users, Orders],
+  collections: [Products, Categories, Media, Users, Orders, Sliders],
   localization: {
     locales: [
       { code: 'ru', label: 'Русский' },
