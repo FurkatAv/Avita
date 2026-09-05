@@ -72,6 +72,7 @@ export interface Config {
     media: Media;
     users: User;
     orders: Order;
+    sliders: Slider;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    sliders: SlidersSelect<false> | SlidersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -237,6 +239,18 @@ export interface Order {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sliders".
+ */
+export interface Slider {
+  id: number;
+  title: string;
+  image: number | Media;
+  link?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -278,6 +292,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'orders';
         value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'sliders';
+        value: number | Slider;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -406,6 +424,17 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface OrdersSelect<T extends boolean = true> {
   total?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sliders_select".
+ */
+export interface SlidersSelect<T extends boolean = true> {
+  title?: T;
+  image?: T;
+  link?: T;
   updatedAt?: T;
   createdAt?: T;
 }
