@@ -24,6 +24,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    push: true,
   }),
   editor: lexicalEditor({}),
   collections: [Products, Categories, Media, Users, Orders, Sliders],
