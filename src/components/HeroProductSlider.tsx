@@ -6,53 +6,67 @@ import { PRODUCTS, tText, tList } from '@/data/products';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
 import { useCurrency } from '@/context/CurrencyContext';
 
-interface HeroProductSliderProps {
+export interface HeroProductSliderProps {
   lang?: Language | string;
   currency?: string;
+  sliders?: any[]; // Поддержка динамических данных из Payload CMS с фоллбеком на статику
 }
 
 export default function HeroProductSlider({
-  lang = 'ru'
+  lang = 'ru',
+  sliders = [],
 }: HeroProductSliderProps) {
   const { formatPrice } = useCurrency();
 
-  // Приводим код языка к поддерживаемому диапазону (по умолчанию 'ru')
+  // Безопасное приведение языка
   const activeLang: Language = (['ru', 'en', 'tr', 'uz', 'de'].includes(lang) ? lang : 'ru') as Language;
   const tUI = UI_TRANSLATIONS[activeLang] || UI_TRANSLATIONS.ru;
+
+  // Используем данные из Payload CMS, если они есть, иначе фоллбек на статический массив
+  const items = sliders && sliders.length > 0 ? sliders : PRODUCTS;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % PRODUCTS.length);
-  }, []);
+    setCurrentIndex((prev) => (prev + 1) % items.length);
+  }, [items.length]);
 
   const prevSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + PRODUCTS.length) % PRODUCTS.length);
-  }, []);
+    setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+  }, [items.length]);
 
-  // Автоматическое листание каждые 3 секунды (3000 мс)
+  // Автопрокрутка с очисткой таймера
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || items.length <= 1) return;
 
-    const timer = setInterval(() => {
-      nextSlide();
-    }, 3000);
-
+    const timer = setInterval(nextSlide, 3000);
     return () => clearInterval(timer);
-  }, [isPaused, nextSlide]);
+  }, [isPaused, nextSlide, items.length]);
+
+  // Сброс индекса при изменении набора данных
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [items.length]);
+
+  if (!items || items.length === 0) return null;
+
+  // Хелпер для безопасного получения URL изображения (поддержка Payload Media объектов и строк)
+  const resolveImage = (imageField: any): string => {
+    if (!imageField) return '/placeholder.png';
+    if (typeof imageField === 'string') return imageField;
+    return imageField.url || '/placeholder.png';
+  };
 
   return (
     <section className="bg-[#FAF9F6] py-0 border-b border-[#CBE0D4]/40 w-full">
       <div className="max-w-7xl mx-auto px-0 sm:px-4">
-        
-        {/* Главный контейнер слайдера (без внешних верхних отступов) */}
         <div
           className="relative overflow-hidden bg-white border-x border-[#CBE0D4] shadow-sm py-4"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* СТРЕЛКА ВЛЕВО */}
+          {/* Кнопка «Назад» */}
           <button
             type="button"
             onClick={prevSlide}
@@ -64,7 +78,7 @@ export default function HeroProductSlider({
             </svg>
           </button>
 
-          {/* СТРЕЛКА ВПРАВО */}
+          {/* Кнопка «Вперед» */}
           <button
             type="button"
             onClick={nextSlide}
@@ -76,77 +90,96 @@ export default function HeroProductSlider({
             </svg>
           </button>
 
-          {/* Горизонтальный трек товаров */}
+          {/* Трек слайдера */}
           <div
             className="w-full flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
-            {PRODUCTS.map((product) => {
-              const formattedPrice = formatPrice(product.basePriceUZS || 0);
-              const title = tText(product.title, activeLang);
-              const subtitle = tText(product.subtitle, activeLang);
-              const compositionList = tList(product.composition, activeLang);
-              const badgesList = tList(product.badges, activeLang);
+            {items.map((item, index) => {
+              // Поддержка полей как из статической структуры, так и из Payload CMS
+              const imageUrl = resolveImage(item.image);
+              const title = typeof item.title === 'string' ? item.title : tText(item.title, activeLang);
+              const subtitle = typeof item.subtitle === 'string' ? item.subtitle : tText(item.subtitle, activeLang);
+              const compositionList = Array.isArray(item.composition) 
+                ? item.composition.map((c: any) => (typeof c === 'string' ? c : c.text || '')) 
+                : tList(item.composition, activeLang);
+              
+              const badgesList = Array.isArray(item.badges)
+                ? item.badges.map((b: any) => (typeof b === 'string' ? b : b.text || ''))
+                : tList(item.badges, activeLang);
+
+              const priceValue = item.basePriceUZS ?? item.price ?? 0;
+              const formattedPrice = formatPrice(priceValue);
 
               return (
                 <div
-                  key={product.id}
+                  key={item.id || index}
                   className="w-full shrink-0 flex flex-col md:flex-row p-4 sm:p-8 items-center justify-between gap-6 px-10 sm:px-14"
                 >
-                  {/* Изображение товара */}
+                  {/* Изображение */}
                   <div className="relative w-full md:w-1/2 h-60 md:h-72 bg-[#EEF4F0] rounded-xl p-4 flex items-center justify-center border border-[#CBE0D4]/50 shrink-0">
                     <Image
-                      src={product.image}
-                      alt={title}
-                      priority
+                      src={imageUrl}
+                      alt={title || 'Product image'}
+                      priority={index === 0}
                       fill
                       unoptimized
                       className="object-contain p-2 hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                      <span className="bg-[#D4AF37] text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-sm">
-                        {product.weight}
-                      </span>
-                      <span className="bg-white/90 backdrop-blur-md text-[#2A4736] text-[10px] font-bold px-2 py-0.5 rounded border border-[#CBE0D4]">
-                        {product.sticks} {tUI.sticksLabel}
-                      </span>
+                      {item.weight && (
+                        <span className="bg-[#D4AF37] text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-sm">
+                          {item.weight}
+                        </span>
+                      )}
+                      {item.sticks && (
+                        <span className="bg-white/90 backdrop-blur-md text-[#2A4736] text-[10px] font-bold px-2 py-0.5 rounded border border-[#CBE0D4]">
+                          {item.sticks} {tUI.sticksLabel}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Описание и состав */}
+                  {/* Контент */}
                   <div className="w-full md:w-1/2 flex flex-col justify-between h-full">
                     <div>
                       <h3 className="text-xl sm:text-2xl font-bold text-[#2A4736] font-montserrat mb-2">
                         {title}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 mb-3 leading-relaxed line-clamp-2">
-                        {subtitle}
-                      </p>
+                      {subtitle && (
+                        <p className="text-xs sm:text-sm text-gray-500 mb-3 leading-relaxed line-clamp-2">
+                          {subtitle}
+                        </p>
+                      )}
 
                       {/* Состав */}
-                      <div className="space-y-1 mb-3">
-                        {compositionList.slice(0, 4).map((item, idx) => (
-                          <div key={idx} className="flex items-start gap-2 text-xs text-[#2A4736]">
-                            <span className="text-[#376C4A] font-bold">✓</span>
-                            <span>{item}</span>
-                          </div>
-                        ))}
-                      </div>
+                      {compositionList.length > 0 && (
+                        <div className="space-y-1 mb-3">
+                          {compositionList.slice(0, 4).map((compItem: string, idx: number) => (
+                            <div key={idx} className="flex items-start gap-2 text-xs text-[#2A4736]">
+                              <span className="text-[#376C4A] font-bold">✓</span>
+                              <span>{compItem}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
-                      {/* Баджи */}
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {badgesList.map((badge, idx) => (
-                          <span
-                            key={idx}
-                            className="bg-[#EEF4F0] text-[#376C4A] text-[10px] font-semibold px-2 py-0.5 rounded border border-[#CBE0D4]"
-                          >
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
+                      {/* Бэджи */}
+                      {badgesList.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {badgesList.map((badge: string, idx: number) => (
+                            <span
+                              key={idx}
+                              className="bg-[#EEF4F0] text-[#376C4A] text-[10px] font-semibold px-2 py-0.5 rounded border border-[#CBE0D4]"
+                            >
+                              {badge}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Цена и Кнопка */}
+                    {/* Цена и Кнопка заказа */}
                     <div className="pt-3 border-t border-[#EEF4F0] flex items-center justify-between gap-4 mt-auto">
                       <div>
                         <span className="text-[10px] text-gray-400 block font-medium">{tUI.price}</span>
@@ -171,9 +204,9 @@ export default function HeroProductSlider({
             })}
           </div>
 
-          {/* Точки-индикаторы */}
+          {/* Индикаторы (точки) */}
           <div className="flex items-center justify-center gap-1.5 pt-2">
-            {PRODUCTS.map((_, idx) => (
+            {items.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -186,7 +219,6 @@ export default function HeroProductSlider({
             ))}
           </div>
         </div>
-
       </div>
     </section>
   );
