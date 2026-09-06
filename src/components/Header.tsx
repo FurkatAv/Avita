@@ -1,10 +1,9 @@
-// src/components/Header.tsx
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
-import { MarketSwitcher } from './MarketSwitcher';
+import MarketSwitcher from './MarketSwitcher';
 
 export interface HeaderProps {
   lang?: Language | string;
@@ -16,13 +15,10 @@ export interface HeaderProps {
 export default function Header({
   lang = 'ru',
   currency = 'USD',
-  onLangChange,
-  onCurrencyChange,
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const activeLang: Language = (['ru', 'en', 'tr', 'uz', 'de'].includes(lang) ? lang : 'ru') as Language;
-  const tUI = UI_TRANSLATIONS[activeLang] || UI_TRANSLATIONS.ru;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -61,12 +57,7 @@ export default function Header({
           {/* Переключатель рынка/языка + Мобильная кнопка */}
           <div className="flex items-center gap-4">
             <div className="hidden sm:block">
-              <MarketSwitcher
-                lang={activeLang}
-                currency={currency}
-                onLangChange={onLangChange}
-                onCurrencyChange={onCurrencyChange}
-              />
+              <MarketSwitcher />
             </div>
 
             {/* Кнопка гамбургер для мобилок */}
@@ -128,12 +119,7 @@ export default function Header({
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Выбор страны / валюты
             </span>
-            <MarketSwitcher
-              lang={activeLang}
-              currency={currency}
-              onLangChange={onLangChange}
-              onCurrencyChange={onCurrencyChange}
-            />
+            <MarketSwitcher />
           </div>
         </div>
       )}

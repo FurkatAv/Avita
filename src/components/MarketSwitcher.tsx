@@ -1,129 +1,72 @@
-// src/components/Header.tsx
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { UI_TRANSLATIONS, Language } from '@/data/translations';
-import { MarketSwitcher } from './MarketSwitcher';
+import { useCurrency } from '../context/CurrencyContext';
 
-export interface HeaderProps {
-  lang?: Language | string;
-  currency?: string;
-  onLangChange?: (newLang: Language) => void;
-  onCurrencyChange?: (newCurrency: string) => void;
-}
+const MARKETS = [
+  { code: 'RU', label: 'RU', flag: '🇷🇺' },
+  { code: 'TR', label: 'TR', flag: '🇹🇷' },
+  { code: 'UZ', label: 'UZ', flag: '🇺🇿' },
+  { code: 'PL', label: 'PL', flag: '🇵🇱' },
+  { code: 'DE', label: 'DE', flag: '🇩🇪' },
+];
 
-export default function Header({
-  lang = 'ru',
-  currency = 'USD',
-}: HeaderProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export default function MarketSwitcher() {
+  const { currentMarket, currentCurrency, setMarket, setCurrency } = useCurrency();
 
-  const activeLang: Language = (['ru', 'en', 'tr', 'uz', 'de'].includes(lang) ? lang : 'ru') as Language;
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen((prev) => !prev);
-  };
+  const activeMarket = (currentMarket || 'RU').toUpperCase();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          
-          {/* Логотип */}
-          <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center gap-2 group">
-              <span className="text-2xl font-black text-[#2A4736] font-montserrat tracking-tight group-hover:text-[#376C4A] transition-colors">
-                AVITA <span className="text-[#D4AF37]">GOLD</span>
-              </span>
-            </Link>
-          </div>
-
-          {/* Навигация для десктопа */}
-          <nav className="hidden md:flex items-center gap-8 font-medium text-sm text-[#2A4736]">
-            <Link href="/" className="hover:text-[#376C4A] transition-colors">
-              Главная
-            </Link>
-            <Link href="/catalog" className="hover:text-[#376C4A] transition-colors">
-              Каталог
-            </Link>
-            <Link href="/about" className="hover:text-[#376C4A] transition-colors">
-              О нас
-            </Link>
-            <Link href="/contact" className="hover:text-[#376C4A] transition-colors">
-              Контакты
-            </Link>
-          </nav>
-
-          {/* Переключатель рынка/языка + Мобильная кнопка */}
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block">
-              <MarketSwitcher />
-            </div>
-
-            {/* Кнопка гамбургер для мобилок */}
+    <div className="flex flex-wrap items-center gap-3">
+      {/* 5 кнопок языков / стран */}
+      <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-[#CBE0D4] shadow-2xs">
+        {MARKETS.map((m) => {
+          const isActive = activeMarket === m.code;
+          return (
             <button
+              key={m.code}
               type="button"
-              onClick={toggleMobileMenu}
-              className="md:hidden p-2 rounded-xl text-[#2A4736] hover:bg-[#EEF4F0] focus:outline-none transition-colors"
-              aria-label="Переключить меню"
+              onClick={() => setMarket(m.code)}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-[#376C4A] text-white shadow-xs scale-105'
+                  : 'text-[#2A4736] hover:bg-[#E3ECE6]'
+              }`}
             >
-              {isMobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
+              <span>{m.flag}</span>
+              <span>{m.label}</span>
             </button>
-          </div>
-        </div>
+          );
+        })}
       </div>
 
-      {/* Выпадающее мобильное меню */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-[#CBE0D4] bg-white px-4 pt-4 pb-6 space-y-4">
-          <nav className="flex flex-col space-y-2 font-medium text-base text-[#2A4736]">
-            <Link
-              href="/"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-[#EEF4F0] transition-colors"
-            >
-              Главная
-            </Link>
-            <Link
-              href="/catalog"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-[#EEF4F0] transition-colors"
-            >
-              Каталог
-            </Link>
-            <Link
-              href="/about"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-[#EEF4F0] transition-colors"
-            >
-              О нас
-            </Link>
-            <Link
-              href="/contact"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-[#EEF4F0] transition-colors"
-            >
-              Контакты
-            </Link>
-          </nav>
-
-          <div className="pt-3 border-t border-[#CBE0D4] flex flex-col items-start gap-2">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Выбор страны / валюты
-            </span>
-            <MarketSwitcher />
-          </div>
+      {/* Переключатель валюты */}
+      {activeMarket === 'RU' && (
+        <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-[#CBE0D4] shadow-2xs">
+          <span className="text-[10px] font-bold text-[#59655E] px-1 uppercase">Валюта:</span>
+          <button
+            type="button"
+            onClick={() => setCurrency('RUB')}
+            className={`px-2 py-0.5 rounded-md text-[11px] font-extrabold transition-all cursor-pointer ${
+              currentCurrency === 'RUB'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
+                : 'text-[#2A4736] hover:bg-[#E3ECE6]'
+            }`}
+          >
+            ₽ (RUB)
+          </button>
+          <button
+            type="button"
+            onClick={() => setCurrency('UZS')}
+            className={`px-2 py-0.5 rounded-md text-[11px] font-extrabold transition-all cursor-pointer ${
+              currentCurrency === 'UZS'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
+                : 'text-[#2A4736] hover:bg-[#E3ECE6]'
+            }`}
+          >
+            сум (UZS)
+          </button>
         </div>
       )}
-    </header>
+    </div>
   );
 }
