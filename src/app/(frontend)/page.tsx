@@ -9,12 +9,26 @@ export const revalidate = 0;
 export default async function HomePage() {
   const payload = await getPayload({ config });
 
-  // Запрос с сортировкой, глубиной для загрузки картинок и актуальными данными
+  // 1. Загрузка слайдеров
   const slidersData = await payload.find({
     collection: 'sliders',
     sort: '-isFeatured,order',
-    depth: 1, // Обязательно, чтобы получить полноценные объекты картинок, а не просто ID
+    depth: 1,
   });
 
-  return <HomeClient sliders={slidersData.docs} />;
+  // 2. Загрузка товаров из Payload CMS
+  const productsData = await payload.find({
+    collection: 'products',
+    sort: '-createdAt',
+    depth: 2, // depth: 2 нужен для массивов изображений товара
+    limit: 100,
+  });
+
+  // Передаем и слайдеры, и реальные товары в компонент
+  return (
+    <HomeClient 
+      sliders={slidersData.docs} 
+      products={productsData.docs} 
+    />
+  );
 }

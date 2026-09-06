@@ -158,12 +158,13 @@ export interface Product {
     [k: string]: unknown;
   } | null;
   price: {
-    baseCurrency: 'RUB' | 'USD' | 'EUR' | 'TRY' | 'UZS';
+    baseCurrency: 'RUB' | 'USD' | 'EUR' | 'TRY' | 'UZS' | 'PLN';
     rub?: number | null;
     usd?: number | null;
     eur?: number | null;
     try?: number | null;
     uzs?: number | null;
+    pln?: number | null;
   };
   categories?: (number | Category)[] | null;
   images?:
@@ -368,6 +369,7 @@ export interface ProductsSelect<T extends boolean = true> {
         eur?: T;
         try?: T;
         uzs?: T;
+        pln?: T;
       };
   categories?: T;
   images?:

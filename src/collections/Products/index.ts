@@ -52,7 +52,6 @@ export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
     useAsTitle: 'title',
-    // Заменили 'price' на 'price.rub' для корректного отображения таблицы
     defaultColumns: ['title', 'sku', 'price.rub', 'isAvailable', 'updatedAt'],
   },
   access: {
@@ -72,7 +71,7 @@ export const Products: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
-      localized: true, // Добавлено: позволяет делать языковые URL
+      localized: true,
       label: 'Slug (ЧПУ для URL)',
       admin: {
         position: 'sidebar',
@@ -112,6 +111,7 @@ export const Products: CollectionConfig = {
             { label: 'Евро (EUR €)', value: 'EUR' },
             { label: 'Турецкая лира (TRY ₺)', value: 'TRY' },
             { label: 'Узбекский сум (UZS)', value: 'UZS' },
+            { label: 'Польский злотый (PLN zł)', value: 'PLN' }, // ✅ Добавлено
           ],
         },
         {
@@ -152,6 +152,13 @@ export const Products: CollectionConfig = {
               min: 0,
               admin: { step: 1 },
             },
+            {
+              name: 'pln',
+              type: 'number',
+              label: 'Цена в PLN (zł)',
+              min: 0,
+              admin: { step: 0.01 },
+            }, // ✅ Добавлено
           ],
         },
       ],

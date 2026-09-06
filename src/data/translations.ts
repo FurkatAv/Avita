@@ -1,6 +1,6 @@
 // data/translations.ts
 
-export type Language = 'ru' | 'en' | 'tr' | 'uz' | 'de';
+export type Language = 'ru' | 'en' | 'tr' | 'uz' | 'de' | 'pl'; // ✅ Добавили 'pl'
 
 export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
   ru: {
@@ -97,5 +97,25 @@ export const UI_TRANSLATIONS: Record<Language, Record<string, string>> = {
     catAmino: "Aminosäuren",
     searchPlaceholder: "Produkte suchen...",
     noProducts: "Keine Produkte für Ihre Anfrage gefunden."
+  },
+  // ✅ Добавлен блок польского языка
+  pl: {
+    catalogTitle: "Katalog produktów",
+    autoScroll: "(Automatyczne przewijanie co 5 sek.)",
+    price: "Cena",
+    orderBtn: "Zamów teraz",
+    buyBtn: "Kup teraz",
+    addToCart: "Do koszyka",
+    cart: "Koszyk",
+    prevSlide: "Poprzedni produkt",
+    nextSlide: "Następny produkt",
+    sticksLabel: "saszetek",
+    allCategories: "Wszystkie",
+    catCollagen: "Kolagen",
+    catComplexes: "Kompleksy kolagenowe",
+    catVitamins: "Witaminy",
+    catAmino: "Aminokwasy",
+    searchPlaceholder: "Szukaj produktów...",
+    noProducts: "Nie znaleziono produktów dla Twojego zapytania."
   }
 };
