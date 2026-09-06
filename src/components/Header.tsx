@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
-import MarketSwitcher from './MarketSwitcher';
+import { MarketSwitcher } from './MarketSwitcher';
 
 export interface HeaderProps {
   lang?: Language | string;
