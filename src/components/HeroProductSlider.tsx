@@ -45,36 +45,39 @@ export default function HeroProductSlider({
 
   if (!items || items.length === 0) return null;
 
-  // Умный хелпер для обработки ссылок на изображения
+  // Безопасный хелпер обработки URL картинок для мобильных браузеров
   const resolveImage = (imageField: any): string => {
     if (!imageField) return '/placeholder.png';
 
     let url = typeof imageField === 'string' ? imageField : (imageField.url || '');
     if (!url) return '/placeholder.png';
 
-    // 1. Получаем URL бэкенда из переменных окружения (.env)
     const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || '';
 
-    // 2. Если Payload отдал локальный путь (localhost), превращаем его в относительный (/media/...)
+    // 1. Превращаем локальные адреса в относительные
     if (url.startsWith('http://localhost') || url.startsWith('http://127.0.0.1')) {
       try {
-        const parsed = new URL(url);
-        url = parsed.pathname;
+        url = new URL(url).pathname;
       } catch (e) {
         // Игнорируем ошибку парсинга
       }
     }
 
-    // 3. Если путь относительный (/media/...) и у нас задан URL бэкенда — склеиваем их!
+    // 2. Если путь относительный (/media/...) — добавляем адрес бэкенда
     if (url.startsWith('/') && backendUrl) {
-      return `${backendUrl.replace(/\/$/, '')}${url}`;
+      url = `${backendUrl.replace(/\/$/, '')}${url}`;
+    }
+
+    // 3. Защита для iOS/Android: принудительный HTTPS для предотвращения блокировки Mixed Content
+    if (url.startsWith('http://') && !url.includes('localhost')) {
+      url = url.replace('http://', 'https://');
     }
 
     return url;
   };
 
   return (
-    <section className="bg-[#FAF9F6] py-4 w-full">
+    <section className="bg-[#FAF9F6] py-4 w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className="relative overflow-hidden bg-white rounded-3xl border border-[#CBE0D4] shadow-sm"
@@ -85,7 +88,7 @@ export default function HeroProductSlider({
             <button
               type="button"
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md border border-[#CBE0D4] text-[#2A4736] hover:bg-[#376C4A] hover:text-white transition-all duration-200 flex items-center justify-center shadow-md active:scale-95"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-[#CBE0D4] text-[#2A4736] hover:bg-[#376C4A] hover:text-white transition-all duration-200 flex items-center justify-center shadow-md active:scale-95"
               aria-label={tUI.prevSlide}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +101,7 @@ export default function HeroProductSlider({
             <button
               type="button"
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md border border-[#CBE0D4] text-[#2A4736] hover:bg-[#376C4A] hover:text-white transition-all duration-200 flex items-center justify-center shadow-md active:scale-95"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-[#CBE0D4] text-[#2A4736] hover:bg-[#376C4A] hover:text-white transition-all duration-200 flex items-center justify-center shadow-md active:scale-95"
               aria-label={tUI.nextSlide}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +131,7 @@ export default function HeroProductSlider({
                         Главная витрина
                       </span>
                     )}
-                    <h2 className="text-3xl sm:text-4xl font-black text-[#2A4736] font-montserrat tracking-tight leading-tight">
+                    <h2 className="text-2xl sm:text-4xl font-black text-[#2A4736] font-montserrat tracking-tight leading-tight">
                       {title}
                     </h2>
                     <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
@@ -148,7 +151,7 @@ export default function HeroProductSlider({
                     )}
                   </div>
 
-                  <div className="relative w-full md:w-1/2 min-h-[300px] md:min-h-[420px] overflow-hidden">
+                  <div className="relative w-full md:w-1/2 h-[260px] sm:h-[340px] md:min-h-[420px] overflow-hidden">
                     <Image
                       src={imageUrl}
                       alt={title || 'Slide image'}

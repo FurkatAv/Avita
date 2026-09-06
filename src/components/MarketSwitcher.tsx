@@ -1,3 +1,4 @@
+// src/components/MarketSwitcher.tsx
 'use client';
 
 import { useCurrency } from '../context/CurrencyContext';
@@ -16,9 +17,9 @@ export default function MarketSwitcher() {
   const activeMarket = (currentMarket || 'RU').toUpperCase();
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-2 max-w-full">
       {/* 5 кнопок языков / стран */}
-      <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-[#CBE0D4] shadow-2xs">
+      <div className="flex flex-wrap items-center gap-1 bg-white/70 p-1 rounded-xl border border-[#CBE0D4] shadow-2xs max-w-full">
         {MARKETS.map((m) => {
           const isActive = activeMarket === m.code;
           return (
@@ -26,7 +27,7 @@ export default function MarketSwitcher() {
               key={m.code}
               type="button"
               onClick={() => setMarket(m.code)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 isActive
                   ? 'bg-[#376C4A] text-white shadow-xs scale-105'
                   : 'text-[#2A4736] hover:bg-[#E3ECE6]'

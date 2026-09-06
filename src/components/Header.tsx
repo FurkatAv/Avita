@@ -1,38 +1,31 @@
+// src/components/Header.tsx
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { UI_TRANSLATIONS, Language } from '@/data/translations';
 import MarketSwitcher from './MarketSwitcher';
 
 export interface HeaderProps {
-  lang?: Language | string;
+  lang?: string;
   currency?: string;
-  onLangChange?: (newLang: Language) => void;
-  onCurrencyChange?: (newCurrency: string) => void;
 }
 
-export default function Header({
-  lang = 'ru',
-  currency = 'USD',
-}: HeaderProps) {
+export default function Header({}: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const activeLang: Language = (['ru', 'en', 'tr', 'uz', 'de'].includes(lang) ? lang : 'ru') as Language;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm w-full max-w-full overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           
           {/* Логотип */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center gap-2 group">
-              <span className="text-2xl font-black text-[#2A4736] font-montserrat tracking-tight group-hover:text-[#376C4A] transition-colors">
+              <span className="text-xl sm:text-2xl font-black text-[#2A4736] font-montserrat tracking-tight group-hover:text-[#376C4A] transition-colors">
                 AVITA <span className="text-[#D4AF37]">GOLD</span>
               </span>
             </Link>
@@ -55,7 +48,7 @@ export default function Header({
           </nav>
 
           {/* Переключатель рынка/языка + Мобильная кнопка */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <div className="hidden sm:block">
               <MarketSwitcher />
             </div>
@@ -83,7 +76,7 @@ export default function Header({
 
       {/* Выпадающее мобильное меню */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-[#CBE0D4] bg-white px-4 pt-4 pb-6 space-y-4">
+        <div className="md:hidden border-t border-[#CBE0D4] bg-white px-4 pt-4 pb-6 space-y-4 max-w-full overflow-x-hidden">
           <nav className="flex flex-col space-y-2 font-medium text-base text-[#2A4736]">
             <Link
               href="/"
@@ -115,7 +108,7 @@ export default function Header({
             </Link>
           </nav>
 
-          <div className="pt-3 border-t border-[#CBE0D4] flex flex-col items-start gap-2">
+          <div className="pt-3 border-t border-[#CBE0D4] flex flex-col items-start gap-2 max-w-full overflow-hidden">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Выбор страны / валюты
             </span>
