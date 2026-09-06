@@ -1,3 +1,4 @@
+// src/components/HeroProductSlider.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -44,10 +45,32 @@ export default function HeroProductSlider({
 
   if (!items || items.length === 0) return null;
 
+  // Умный хелпер для обработки ссылок на изображения
   const resolveImage = (imageField: any): string => {
     if (!imageField) return '/placeholder.png';
-    if (typeof imageField === 'string') return imageField;
-    return imageField.url || '/placeholder.png';
+
+    let url = typeof imageField === 'string' ? imageField : (imageField.url || '');
+    if (!url) return '/placeholder.png';
+
+    // 1. Получаем URL бэкенда из переменных окружения (.env)
+    const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || '';
+
+    // 2. Если Payload отдал локальный путь (localhost), превращаем его в относительный (/media/...)
+    if (url.startsWith('http://localhost') || url.startsWith('http://127.0.0.1')) {
+      try {
+        const parsed = new URL(url);
+        url = parsed.pathname;
+      } catch (e) {
+        // Игнорируем ошибку парсинга
+      }
+    }
+
+    // 3. Если путь относительный (/media/...) и у нас задан URL бэкенда — склеиваем их!
+    if (url.startsWith('/') && backendUrl) {
+      return `${backendUrl.replace(/\/$/, '')}${url}`;
+    }
+
+    return url;
   };
 
   return (
@@ -99,7 +122,6 @@ export default function HeroProductSlider({
                   key={item.id || index}
                   className="w-full shrink-0 flex flex-col md:flex-row items-stretch justify-between bg-gradient-to-r from-[#FAF9F6] to-[#EEF4F0]"
                 >
-                  {/* Текстовая часть */}
                   <div className="w-full md:w-1/2 flex flex-col items-start justify-center text-left p-6 sm:p-12 space-y-4">
                     {isFeatured && (
                       <span className="bg-[#D4AF37] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
@@ -126,7 +148,6 @@ export default function HeroProductSlider({
                     )}
                   </div>
 
-                  {/* Картинка на весь край */}
                   <div className="relative w-full md:w-1/2 min-h-[300px] md:min-h-[420px] overflow-hidden">
                     <Image
                       src={imageUrl}
