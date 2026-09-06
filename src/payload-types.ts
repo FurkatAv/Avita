@@ -137,6 +137,9 @@ export interface UserAuthOperations {
 export interface Product {
   id: number;
   title: string;
+  /**
+   * Заполняется автоматически из названия при сохранении
+   */
   slug: string;
   sku: string;
   description?: {
