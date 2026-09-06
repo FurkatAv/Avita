@@ -62,8 +62,8 @@ export default function Header({
           <div className="flex items-center gap-4">
             <div className="hidden sm:block">
               <MarketSwitcher
-                currentLang={activeLang}
-                currentCurrency={currency}
+                lang={activeLang}
+                currency={currency}
                 onLangChange={onLangChange}
                 onCurrencyChange={onCurrencyChange}
               />
@@ -129,8 +129,8 @@ export default function Header({
               Выбор страны / валюты
             </span>
             <MarketSwitcher
-              currentLang={activeLang}
-              currentCurrency={currency}
+              lang={activeLang}
+              currency={currency}
               onLangChange={onLangChange}
               onCurrencyChange={onCurrencyChange}
             />
