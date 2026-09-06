@@ -172,33 +172,33 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
   });
 
   return (
-    <main className="min-h-screen bg-[#FAF9F6] m-0 p-0">
+    <main className="min-h-screen bg-[#FAF9F6] m-0 p-0 overflow-x-hidden">
       {/* 1. ШАПКА САЙТА */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm m-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 shrink-0 cursor-pointer">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 shrink-0 cursor-pointer">
             <div className="flex flex-col items-center text-center">
-              <div className="text-lg sm:text-xl font-black tracking-wider leading-none flex items-center gap-1.5">
+              <div className="text-base sm:text-xl font-black tracking-wider leading-none flex items-center gap-1">
                 <span className="text-red-600">AVITA</span>
                 <span className="text-[#D4AF37]">GOLD</span>
               </div>
-              <span className="text-[10px] font-bold text-red-600 tracking-widest uppercase mt-0.5">
+              <span className="text-[9px] sm:text-[10px] font-bold text-red-600 tracking-widest uppercase mt-0.5">
                 EXCLUSIVE
               </span>
             </div>
           </div>
 
-          <div className="flex-1 max-w-md mx-2 sm:mx-4">
+          <div className="flex-1 min-w-0 max-w-md mx-1 sm:mx-4">
             <div className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={tUI.searchPlaceholder}
-                className="w-full bg-[#FAF9F6] border border-[#CBE0D4] text-[#2A4736] placeholder-gray-400 text-xs sm:text-sm rounded-xl pl-10 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#376C4A] transition-all"
+                className="w-full bg-[#FAF9F6] border border-[#CBE0D4] text-[#2A4736] placeholder-gray-400 text-xs sm:text-sm rounded-xl pl-9 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-[#376C4A] transition-all"
               />
               <svg
-                className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2"
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -208,7 +208,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-bold"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-bold"
                 >
                   ✕
                 </button>
@@ -216,7 +216,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <select
               value={`${currentLanguage}-${currency}`}
               onChange={(e) => {
@@ -227,7 +227,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
                   setContextCurrency(selectedCurr);
                 }
               }}
-              className="bg-[#FAF9F6] border border-[#CBE0D4] text-[#2A4736] text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#376C4A] cursor-pointer"
+              className="w-[105px] sm:w-auto bg-[#FAF9F6] border border-[#CBE0D4] text-[#2A4736] text-[11px] sm:text-xs font-bold rounded-xl px-2 sm:px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#376C4A] cursor-pointer"
             >
               {locales.map((loc) => (
                 <option key={`${loc.lang}-${loc.currency}`} value={`${loc.lang}-${loc.currency}`}>
@@ -238,7 +238,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
 
             <button
               type="button"
-              className="relative bg-[#376C4A] hover:bg-[#2A4736] text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shadow-sm active:scale-95"
+              className="relative bg-[#376C4A] hover:bg-[#2A4736] text-white font-bold text-xs px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
@@ -302,7 +302,6 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
             })}
           </div>
 
-          {/* Индикаторы слайдера */}
           {sliders.length > 1 && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
               {sliders.map((_, idx) => (
