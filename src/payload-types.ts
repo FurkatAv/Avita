@@ -248,6 +248,7 @@ export interface Order {
 export interface Slider {
   id: number;
   title: string;
+  description?: string | null;
   image: number | Media;
   link?: string | null;
   /**
@@ -446,6 +447,7 @@ export interface OrdersSelect<T extends boolean = true> {
  */
 export interface SlidersSelect<T extends boolean = true> {
   title?: T;
+  description?: T;
   image?: T;
   link?: T;
   isFeatured?: T;

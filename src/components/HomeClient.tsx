@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
+import SplitCarousel from '@/components/SplitCarousel';
 
 interface HomeClientProps {
   sliders: any[];
@@ -30,12 +31,37 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  // Корзина и состояние открытия боковой панели
-  const [cartItems, setCartItems] = useState<Array<{ product: any; quantity: number }>>([]);
+  // Инициализация корзины с помощью переданного кода
+  const [cartItems, setCartItems] = useState<Array<{ product: any; quantity: number }>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('avita_cart');
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+  
+  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
-
-  const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>(DEFAULT_RATES);
+
+  // Отмечаем монтирование компонента на клиенте
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Сохранение корзины в localStorage при изменении
+  useEffect(() => {
+    if (!isMounted) return;
+    try {
+      localStorage.setItem('avita_cart', JSON.stringify(cartItems));
+    } catch (e) {
+      console.error('Ошибка сохранения корзины:', e);
+    }
+  }, [cartItems, isMounted]);
 
   useEffect(() => {
     if (contextCurrency && contextCurrency !== currency) {
@@ -55,14 +81,6 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
         console.error('Ошибка загрузки актуальных курсов валют:', err);
       });
   }, []);
-
-  useEffect(() => {
-    if (!sliders || sliders.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % sliders.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [sliders]);
 
   const tUI = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.ru;
 
@@ -84,7 +102,6 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
     { id: 'amino', label: tUI.catAmino },
   ];
 
-  // Функция добавления товара в корзину и открытия корзины
   const handleAddToCart = (product: any) => {
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((item) => item.product.id === product.id);
@@ -98,7 +115,6 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
     setIsCartOpen(true);
   };
 
-  // Изменение количества товара в корзине
   const updateQuantity = (productId: string, delta: number) => {
     setCartItems((prev) => {
       return prev
@@ -123,7 +139,6 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
     return '';
   };
 
-  // Вычисление чистой цены в виде числа для расчетов общей суммы
   const getProductPriceNumeric = (product: any): number => {
     if (!product?.price) return 0;
     const safeCurrency = (currency || 'USD').toString().toUpperCase();
@@ -196,6 +211,13 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
     if (firstImg?.url) return firstImg.url;
     return '/placeholder.jpg';
   };
+
+  const formattedSlides = sliders.map((slide, index) => ({
+    id: slide.id || index.toString(),
+    title: getLocalizedText(slide.title, currentLanguage),
+    description: getLocalizedText(slide.description, currentLanguage),
+    imageUrl: typeof slide.image === 'string' ? slide.image : slide.image?.url || '',
+  }));
 
   const filteredProducts = products.filter((product) => {
     const title = getLocalizedText(product.title, currentLanguage).toLowerCase();
@@ -283,7 +305,8 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
               </svg>
               <span className="hidden sm:inline">{tUI.cart}</span>
-              {cartCount > 0 && (
+              {/* Отрисовка счетчика безопасна только после монтирования */}
+              {isMounted && cartCount > 0 && (
                 <span className="bg-[#D4AF37] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {cartCount}
                 </span>
@@ -311,50 +334,10 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
         </div>
       </header>
 
-      {/* 2. КОМПАКТНАЯ КАРУСЕЛЬ */}
-      {sliders && sliders.length > 0 && (
-        <div className="relative w-full overflow-hidden m-0 p-0 leading-none bg-[#EBF4FA]">
-          <div
-            className="flex transition-transform duration-700 ease-in-out w-full m-0 p-0"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-          >
-            {sliders.map((slide, index) => {
-              const slideTitle = getLocalizedText(slide.title, currentLanguage);
-              const slideImg = typeof slide.image === 'string' ? slide.image : slide.image?.url || '';
-
-              return (
-                <div key={slide.id || index} className="w-full flex-shrink-0 relative m-0 p-0">
-                  <div className="relative w-full h-[260px] sm:h-[320px] lg:h-[380px] bg-[#EBF4FA] flex items-center justify-center m-0 p-0">
-                    {slideImg && (
-                      <Image
-                        src={slideImg}
-                        alt={slideTitle || 'Banner'}
-                        fill
-                        unoptimized
-                        priority={index === 0}
-                        className="w-full h-full object-contain m-0 p-0"
-                      />
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {sliders.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
-              {sliders.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    currentSlide === idx ? 'w-6 bg-[#376C4A]' : 'w-1.5 bg-[#2A4736]/30 hover:bg-[#2A4736]/60'
-                  }`}
-                  aria-label={`Slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          )}
+      {/* 2. СПЛИТ-КАРУСЕЛЬ */}
+      {formattedSlides.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <SplitCarousel slides={formattedSlides} />
         </div>
       )}
 
@@ -366,17 +349,17 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-0 mt-0">
-            {filteredProducts.map((product) => {
+            {filteredProducts.map((product, index) => {
               const title = getLocalizedText(product.title, currentLanguage);
               const priceString = getProductPriceString(product);
               const imageUrl = getImageUrl(product);
+              const isPriority = index < 2;
 
               return (
                 <div
                   key={product.id}
                   className="bg-white rounded-2xl border border-[#CBE0D4] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group mt-0"
                 >
-                  {/* Кликабельная область для перехода на карточку товара */}
                   <Link href={`/products/${product.id}`} className="block">
                     <div className="relative w-full h-48 bg-[#EEF4F0] rounded-xl mb-4 p-4 flex items-center justify-center overflow-hidden">
                       <Image
@@ -384,6 +367,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
                         alt={title}
                         fill
                         unoptimized
+                        priority={isPriority}
                         className="object-contain group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
@@ -394,7 +378,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
 
                     {product.sku && (
                       <p className="text-[10px] text-gray-400 mb-2">
-                        Артикул: {product.sku}
+                        {tUI.sku || 'Артикул'}: {product.sku}
                       </p>
                     )}
                   </Link>
@@ -435,15 +419,12 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
       {/* 4. ВЫЕЗЖАЮЩАЯ КОРЗИНА (DRAWER) */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          {/* Затемнение фона */}
           <div
             className="fixed inset-0 bg-black/50 transition-opacity backdrop-blur-sm"
             onClick={() => setIsCartOpen(false)}
           />
 
-          {/* Боковая панель */}
           <div className="relative w-full max-w-md bg-white h-full shadow-2xl z-10 flex flex-col">
-            {/* Заголовок корзины */}
             <div className="p-4 sm:p-6 border-b border-[#CBE0D4] flex items-center justify-between bg-[#EEF4F0]">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-black text-[#2A4736]">{tUI.cart}</h2>
@@ -459,16 +440,15 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
               </button>
             </div>
 
-            {/* Список товаров в корзине */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               {cartItems.length === 0 ? (
                 <div className="text-center py-20">
-                  <p className="text-gray-400 text-sm mb-4">Корзина пуста</p>
+                  <p className="text-gray-400 text-sm mb-4">{tUI.cartEmpty || 'Корзина пуста'}</p>
                   <button
                     onClick={() => setIsCartOpen(false)}
                     className="bg-[#376C4A] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-sm"
                   >
-                    Перейти к покупкам
+                    {tUI.goToShop || 'Перейти к покупкам'}
                   </button>
                 </div>
               ) : (
@@ -512,11 +492,10 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
               )}
             </div>
 
-            {/* Итог и кнопка оформления заказа */}
             {cartItems.length > 0 && (
               <div className="p-4 sm:p-6 border-t border-[#CBE0D4] bg-[#EEF4F0] flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-gray-500">Итого:</span>
+                  <span className="text-xs font-bold text-gray-500">{tUI.total || 'Итого:'}</span>
                   <span className="text-lg font-black text-[#2A4736]">
                     {formatPriceNumber(cartTotalPrice)}
                   </span>
@@ -528,7 +507,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
                   }}
                   className="w-full bg-[#376C4A] hover:bg-[#2A4736] text-white text-sm font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 text-center"
                 >
-                  Оформить заказ
+                  {tUI.checkout || 'Оформить заказ'}
                 </button>
               </div>
             )}

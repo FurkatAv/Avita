@@ -33,6 +33,13 @@ export const Sliders: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Название слайда',
+      localized: true, // <--- Включает перевод для заголовка
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'Описание слайда',
+      localized: true, // <--- Включает перевод для описания
     },
     {
       name: 'image',
