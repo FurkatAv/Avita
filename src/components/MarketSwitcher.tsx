@@ -1,4 +1,3 @@
-// src/components/MarketSwitcher.tsx
 'use client';
 
 import { useCurrency } from '../context/CurrencyContext';
@@ -39,7 +38,7 @@ export default function MarketSwitcher() {
 
   // Функция для обработки смены валюты
   const handleCurrencyChange = (currency: string) => {
-    setCurrency(currency);
+    setCurrency(currency as any);
 
     const currLower = currency.toLowerCase();
     localStorage.setItem('avita_currency', currLower);
