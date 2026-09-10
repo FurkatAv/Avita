@@ -2,6 +2,7 @@
 
 import { useCurrency } from '@/context/CurrencyContext';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
@@ -22,6 +23,7 @@ const DEFAULT_RATES: Record<string, number> = {
 };
 
 export default function HomeClient({ sliders = [], products = [] }: HomeClientProps) {
+  const router = useRouter();
   const currencyContext = (useCurrency() || {}) as any;
   const contextCurrency = currencyContext?.currency;
   const setContextCurrency = currencyContext?.setCurrency;
@@ -31,7 +33,7 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  // Инициализация корзины с помощью переданного кода
+  // Инициализация корзины
   const [cartItems, setCartItems] = useState<Array<{ product: any; quantity: number }>>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -305,7 +307,6 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
               </svg>
               <span className="hidden sm:inline">{tUI.cart}</span>
-              {/* Отрисовка счетчика безопасна только после монтирования */}
               {isMounted && cartCount > 0 && (
                 <span className="bg-[#D4AF37] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {cartCount}
@@ -503,9 +504,10 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
                 <button
                   type="button"
                   onClick={() => {
-                    alert('Переход к оформлению заказа...');
+                    setIsCartOpen(false);
+                    router.push('/checkout');
                   }}
-                  className="w-full bg-[#376C4A] hover:bg-[#2A4736] text-white text-sm font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 text-center"
+                  className="w-full bg-[#376C4A] hover:bg-[#2A4736] text-white text-sm font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 text-center cursor-pointer"
                 >
                   {tUI.checkout || 'Оформить заказ'}
                 </button>

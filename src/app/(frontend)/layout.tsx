@@ -1,13 +1,17 @@
 import './globals.css';
-import { CurrencyProvider } from '@/context/CurrencyContext'; // Алиас @ указывает на папку src
+import { CurrencyProvider } from '@/context/CurrencyContext';
+import { cookies } from 'next/headers';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'ru';
+
   return (
-    <html lang="ru">
+    <html lang={locale}>
       <body>
         <CurrencyProvider>
           {children}

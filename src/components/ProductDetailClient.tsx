@@ -2,10 +2,12 @@
 
 import { useCurrency } from '@/context/CurrencyContext';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { UI_TRANSLATIONS, Language } from '@/data/translations';
 import { RichText } from '@payloadcms/richtext-lexical/react';
+import { ProductBenefitsAdvanced } from '@/components/ProductBenefitsAdvanced';
 
 interface ProductDetailClientProps {
   product: any;
@@ -21,6 +23,7 @@ const DEFAULT_RATES: Record<string, number> = {
 };
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const router = useRouter();
   const currencyContext = (useCurrency() || {}) as any;
   const contextCurrency = currencyContext?.currency;
   const setContextCurrency = currencyContext?.setCurrency;
@@ -211,7 +214,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               className="relative bg-[#376C4A] hover:bg-[#2A4736] text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
               </svg>
               <span>{tUI.cart}</span>
               {cartCount > 0 && (
@@ -230,6 +233,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           ← На главную в каталог
         </Link>
 
+        {/* Карточка товара с ценой и кнопками */}
         <div className="bg-white rounded-3xl border border-[#CBE0D4] p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-10 shadow-sm">
           {/* Картинка */}
           <div className="relative w-full h-[350px] sm:h-[450px] bg-[#EEF4F0] rounded-2xl flex items-center justify-center p-6 overflow-hidden">
@@ -290,6 +294,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             </div>
           </div>
         </div>
+
+        {/* ✨ ЗОЛОТАЯ ПЛАШКА ПРЕИМУЩЕСТВ AVITA GOLD ✨ */}
+        <ProductBenefitsAdvanced />
       </div>
 
       {/* Выезжающая корзина */}
@@ -348,7 +355,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   <span className="text-xs font-bold text-gray-500">Итого:</span>
                   <span className="text-lg font-black text-[#2A4736]">{formatPriceNumber(cartTotalPrice)}</span>
                 </div>
-                <button type="button" onClick={() => alert('Переход к оформлению заказа...')} className="w-full bg-[#376C4A] hover:bg-[#2A4736] text-white text-sm font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCartOpen(false);
+                    router.push('/checkout');
+                  }}
+                  className="w-full bg-[#376C4A] hover:bg-[#2A4736] text-white text-sm font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 text-center cursor-pointer"
+                >
                   Оформить заказ
                 </button>
               </div>
