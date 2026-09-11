@@ -238,14 +238,21 @@ export default function HomeClient({ sliders = [], products = [] }: HomeClientPr
       {/* 1. ШАПКА САЙТА */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm m-0">
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center gap-2 shrink-0 cursor-pointer">
-            <Link href="/" className="flex flex-col items-center text-center">
-              <div className="text-base sm:text-xl font-black tracking-wider leading-none flex items-center gap-1">
-                <span className="text-red-600">AVITA</span>
-                <span className="text-[#D4AF37]">GOLD</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3">
+              <div className="relative w-11 h-11 sm:w-13 sm:h-13 overflow-hidden rounded-full border-2 border-[#D4AF37] shadow-sm shrink-0">
+                <Image
+                  src="/avita-logo.jpg"
+                  alt="Avita Gold Logo"
+                  fill
+                  sizes="(max-width: 640px) 44px, 52px"
+                  className="object-cover"
+                  priority
+                />
               </div>
-              <span className="text-[9px] sm:text-[10px] font-bold text-red-600 tracking-widest uppercase mt-0.5">
-                EXCLUSIVE
+              <span className="text-base sm:text-xl font-black tracking-tight whitespace-nowrap">
+                <span className="text-red-600">Avita</span>
+                <span className="text-[#D4AF37]">Gold</span>
               </span>
             </Link>
           </div>

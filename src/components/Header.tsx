@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import MarketSwitcher from './MarketSwitcher';
 import CartDrawer, { CartItem } from './CartDrawer';
 
@@ -96,16 +97,27 @@ export default function Header({}: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm w-full max-w-full overflow-x-clip">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#CBE0D4] shadow-sm w-full overflow-x-hidden">
+        
+        {/* ТЕСТОВАЯ ПЛАШКА ДЛЯ ПРОВЕРКИ ОБНОВЛЕНИЯ */}
+        <div className="bg-red-600 text-white text-center py-2 font-bold text-lg">
+          ТЕСТ: ЭТОТ КОД РАБОТАЕТ!
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             
-            {/* Логотип */}
+            {/* Логотип (с правильным путем к картинке) */}
             <div className="flex-shrink-0">
-              <Link href="/" className="flex items-center gap-2 group">
-                <span className="text-xl sm:text-2xl font-black text-[#2A4736] font-montserrat tracking-tight group-hover:text-[#376C4A] transition-colors">
-                  AVITA <span className="text-[#D4AF37]">GOLD</span>
-                </span>
+              <Link href="/" className="flex items-center gap-2 group transition-transform hover:scale-105">
+                <Image 
+                  src="/images/products/avita-logo.jpg" 
+                  alt="Avita Gold - Premium Collagen & Vitamins" 
+                  width={56} 
+                  height={56} 
+                  className="object-contain rounded-full shadow-sm w-12 h-12 sm:w-16 sm:h-16"
+                  priority 
+                />
               </Link>
             </div>
 
@@ -125,13 +137,13 @@ export default function Header({}: HeaderProps) {
               </Link>
             </nav>
 
-            {/* Переключатель рынка/языка + Кнопка корзины + Мобильная кнопка */}
+            {/* Элементы управления справа */}
             <div className="flex items-center gap-2 sm:gap-4">
               <div className="hidden sm:block">
                 <MarketSwitcher />
               </div>
 
-              {/* Интерактивная кнопка корзины */}
+              {/* Кнопка корзины */}
               <button
                 type="button"
                 onClick={() => setIsCartOpen(true)}
@@ -145,7 +157,6 @@ export default function Header({}: HeaderProps) {
                   {t('cart')}
                 </span>
                 
-                {/* Бейдж количества */}
                 {totalItemsCount > 0 && (
                   <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-black rounded-full bg-[#d4af37] text-[#22060b]">
                     {totalItemsCount}
@@ -153,7 +164,7 @@ export default function Header({}: HeaderProps) {
                 )}
               </button>
 
-              {/* Кнопка гамбургер для мобилок */}
+              {/* Мобильная кнопка меню */}
               <button
                 type="button"
                 onClick={toggleMobileMenu}
@@ -174,9 +185,9 @@ export default function Header({}: HeaderProps) {
           </div>
         </div>
 
-        {/* Выпадающее мобильное меню */}
+        {/* Выпадающее мобильное меню с защитой от вылетов за экран */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-[#CBE0D4] bg-white px-4 pt-4 pb-6 space-y-4 max-w-full overflow-x-hidden">
+          <div className="md:hidden border-t border-[#CBE0D4] bg-white px-4 pt-4 pb-6 space-y-4 w-full overflow-hidden box-border shadow-lg">
             <nav className="flex flex-col space-y-2 font-medium text-base text-[#2A4736]">
               <Link
                 href="/"
@@ -208,11 +219,13 @@ export default function Header({}: HeaderProps) {
               </Link>
             </nav>
 
-            <div className="pt-3 border-t border-[#CBE0D4] flex flex-col items-start gap-2 max-w-full overflow-hidden">
+            <div className="pt-3 border-t border-[#CBE0D4] flex flex-col items-stretch gap-2 w-full">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 {t('market')}
               </span>
-              <MarketSwitcher />
+              <div className="w-full [&>div]:w-full">
+                <MarketSwitcher />
+              </div>
             </div>
           </div>
         )}
